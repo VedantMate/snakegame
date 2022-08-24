@@ -101,6 +101,10 @@ class SNAKE:
     def add_block(self):
         self.new_block = True
 
+    def reset(self):
+        self.body = [Vector2(5,10),Vector2(4,10),Vector2(3,10)]
+         
+
 class FRUIT:
     def __init__(self):
         self.randomize()
@@ -132,6 +136,7 @@ class MAIN:
         self.draw_grass()
         self.fruit.draw_fruit()
         self.snake.draw_snake()
+        self.draw_score()
     
     def check_collision(self):
         if self.fruit.pos == self.snake.body[0]: 
@@ -139,6 +144,10 @@ class MAIN:
             #add another block to the snack
             self.fruit.randomize()
             self.snake.add_block()
+        
+        for block in self.snake.body[1:]:
+            if block == self.fruit.pos:
+                self.fruit.randomize()
             
     def check_fail(self):
         #check if snake hits wall
@@ -154,8 +163,7 @@ class MAIN:
                 self.game_over()
     
     def game_over(self):
-        pygame.quit()
-        sys.exit()
+        self.snake.reset()
 
     def draw_grass(self):
         grass_colour = (144,238,144)
@@ -172,6 +180,19 @@ class MAIN:
                         grass_rect = pygame.Rect(col * cell_size,row*cell_size,cell_size,cell_size)
                         pygame.draw.rect(screen,grass_colour,grass_rect)
 
+    def draw_score(self):
+        score_text = str(len(self.snake.body)-3)
+        score_surface =game_font.render(score_text,True,(56,74,12))
+        score_x = int(cell_size*cell_number-50)
+        score_y = int(cell_size*cell_number -40)
+        score_rect = score_surface.get_rect(center =(score_x,score_y))
+        apple_rect=apple.get_rect(midright= (score_rect.left,score_rect.right))
+        bg_rect = pygame.Rect(apple_rect.left-10,apple_rect.top,apple_rect.width + score_rect.width +15,apple_rect.height+10)
+
+        pygame.draw.rect(screen,(135,206,250),bg_rect)
+        screen.blit(score_surface,score_rect)
+        screen.blit(apple,apple_rect)
+        pygame.draw.rect(screen,(106,90,205),bg_rect,2)
 
 pygame.init()
 cell_size = 30
@@ -179,6 +200,7 @@ cell_number= 20
 screen = pygame.display.set_mode((cell_number * cell_size , cell_number * cell_size ))  #size of screen
 clock = pygame.time.Clock() #frame rate
 apple = pygame.image.load("graphics\ple.png").convert_alpha()
+game_font = pygame.font.Font(r'text\lemon_milk\LEMONMILK-Medium.otf',25)
 
 #test_surface = pygame.Surface((100,200))  
 #test_rect = test_surface.get_rect(center = (200,250))
